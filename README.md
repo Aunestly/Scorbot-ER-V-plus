@@ -3,9 +3,10 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 
 ## Table Of Contents
 - [Project Overview](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#project-overview)
+- [Possible Technologies](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#possible-technologies)
 - [Objective](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
-- [Goals](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
 - [Methodology](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#potential-methodology)
+- [Goals](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#goals)
 - [Results]
 - [Key Findings]
 - [Visualizations]
@@ -13,14 +14,15 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 - [Future Work]
 - [Individual Contributions]
 
+
+## Project Overview
+Engineer, design and build a custom controller box from the ground up for a SCORBOT-ER V Plus robotic arm and conveyor belt system. The goal is to replace the original, outdated controller with a flexible, powerful, and cost effective system built on contemporary components and open-source software. 
+
 ## Possible Technologies
 - SCORBOT-ER V Plus
 - Thonny
 - Micropython
 - Gemini AI
-
-## Project Overview
-Engineer, design and build a custom controller box from the ground up for a SCORBOT-ER V Plus robotic arm and conveyor belt system. The goal is to replace the original, outdated controller with a flexible, powerful, and cost effective system built on contemporary components and open-source software. 
 
 ## Objectives
 - Physically mount the Raspberry Pi Pico W, 6 H-Bridges, 1 x 2- Relay modules, fuse block, and buck converter into a single organzied enclosure.
