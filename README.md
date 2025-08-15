@@ -54,8 +54,12 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
   26. Set Up a MicroPython Environment: Install the Micropython firmwar on your Raspberry Pi Pico W
   27. Establish a connection using Thonny IDE.
   28. Open Loop Motor Test: Connect our controller to the robot arm/
-  29. Write a simple program to control just one motor. The program should have functions to run the motor forward, backward, and at different speeds using PWN, without any geedback from the encoders.
-  30. 
+  29. Write a simple program to control just one motor. The program should have functions to run the motor forward, backward, and at different speeds using PWM, without any geedback from the encoders.
+  30. Encoder Reading Test: Write a program that uses a PIO state machine to read the encoder count from that same joint. The program should just print the live encoder position to the screen as you move the joint by hand.
+  31. Combine the logic from steps 12 and 13.
+  32. Implement a PID control algorithm that takes a "target position" (an encoder count) as an input. The algorhithm will use the live encoder reading to automatically calculate the required. motor speed and direct to reach the target and hold it there.
+  33. PID Tuning: Carefully tuned the P, I, and D constants for that one joint until its movement is fast, accurate and stable with minimal overshoot or oscillation.
+  34. Expand to all joints: expand your software architecture to handle all six joints. Each jiont will need its own set of tuned PID constants.
 
 # Goals
 Build a safe, reliable and fully wired custom controller box that can deliver power to all robotic components. Create a complete and accurate "pinout map" of the SCORBOT's 50-pin connector making the robot wiring fully understood. Then wire Micropython that achieves stable, precise and command-based control over all six joints of the SCORBOT arm.
