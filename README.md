@@ -2,10 +2,10 @@
 two vertical articulated robots, with five revolute joints. Gripper attached and five degrees of freedom, and a conveyor belt.
 
 ## Table Of Contents
-- [Project Overview]
-- [Objective]
-- [Goals]
-- [Methodology]
+- [Project Overview](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#project-overview)
+- [Objective](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
+- [Goals](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
+- [Methodology](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#potential-methodology)
 - [Results]
 - [Key Findings]
 - [Visualizations]
