@@ -1,4 +1,4 @@
-# Scorbot-ER-V-plus & Conveyor Belt
+# Scorbot-ER-V plus with Conveyor Belt
 two vertical articulated robots, with five revolute joints. Gripper attached and five degrees of freedom, and a conveyor belt.
 
 ## Table Of Contents
@@ -9,6 +9,7 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 - [Results]
 - [Key Findings]
 - [Visualizations]
+- [Equipment](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#equipment)
 - [Future Work]
 - [Individual Contributions]
 
@@ -78,12 +79,15 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
   39. Implement Homing Sequence: Write a final routine that, on startup or when a "Home" command is received wireelssly, slowly moves each joint until its home switch is triggered. This is supposed to zero the encoder counts and give the robot a known starting position.
 
 ## Goals
-Build a safe, reliable and fully wired custom controller box that can deliver power to all robotic components. Create a complete and accurate "pinout map" of the SCORBOT's 50-pin connector making the robot wiring fully understood. Then wire Micropython that achieves stable, precise and command-based control over all six joints of the SCORBOT arm.
+- Build a safe, reliable and fully wired custom controller box that can deliver power to all robotic components.
+- Create a complete and accurate "pinout map" of the SCORBOT's 50-pin connector making the robot wiring fully understood.
+- Then wire Micropython that achieves stable, precise and command-based control over all six joints of the SCORBOT arm.
 
 
 
 ## Visualizations
-### Supplies:
+
+## Equipment:
 1. Controller: 1 x Raspberry Pi Pico W Microcontroller
 2. Power Supply: 1 x 12V 50A power supply
 3. Safety: 6 Way fused distribution block**
