@@ -1,16 +1,27 @@
-# Scorbot-ER-V-plus
+# Scorbot-ER-V-plus & Conveyor Belt
 two vertical articulated robots, with five revolute joints. Gripper attached and five degrees of freedom, and a conveyor belt.
 
-# Possible Technologies
-- SCORBOT-ER 
+## Table Of Contents
+- [Project Overview]
+- [Objective]
+- [Goals]
+- [Methodology]
+- [Results]
+- [Key Findings]
+- [Visualizations]
+- [Future Work]
+- [Individual Contributions]
+
+## Possible Technologies
+- SCORBOT-ER V Plus
 - Thonny
 - Micropython
 - Gemini AI
 
-# Project Overview
+## Project Overview
 Engineer, design and build a custom controller box from the ground up for a SCORBOT-ER V Plus robotic arm and conveyor belt system. The goal is to replace the original, outdated controller with a flexible, powerful, and cost effective system built on contemporary components and open-source software. 
 
-# Objectives
+## Objectives
 - Physically mount the Raspberry Pi Pico W, 6 H-Bridges, 1 x 2- Relay modules, fuse block, and buck converter into a single organzied enclosure.
 - Correctly wire the 12 V power system from the main power supply, through the fuse block, to all H-bridges and the relay module using appropriate gauge wire.
 - Sucessfully create and test the 5V power system using the buck converter.
@@ -21,11 +32,11 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
 - Produce a final, verified chart that maps every necessary wire from the robot's DB50 connector to a specific terminal on your breakout board.
 - Sucessfully read all six encoders simultaneously and accurately using the Raspberry Pi Pico W's PIO feature.
 - Write and test basic open-loop code to control the speed and direction of a single motor.
-- Implement and tune a stable PID contrl loop for one joint, allowing it to move to a target position and hold it firmly.
+- Implement and tune a stable PID contr0l loop for one joint, allowing it to move to a target position and hold it firmly.
 - Expand the PID control system to manage all six joints concurrently
 - Create a simpler user interface (e.g., via serial commands from your computer) to command the robot to move to a specific coordinates or positions.
 
-  # Potential Methodology
+  ## Potential Methodology
   1. Physical Layout: Design a Layout for all components within your chosen enclosure
   2. Mounting: Securely mount the Raspberry Pi Pico, all 6 H bridge modules, the 2-Relay module, the fuse block, the 12V-to-5V buck converter and any terminal blocks.
   3. Wiring: Using thick 12 or 14 AWG wire, connect your main 12V power supply to the input of our fuse block
@@ -59,28 +70,24 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
   31. Combine the logic from steps 12 and 13.
   32. Implement a PID control algorithm that takes a "target position" (an encoder count) as an input. The algorhithm will use the live encoder reading to automatically calculate the required. motor speed and direct to reach the target and hold it there.
   33. PID Tuning: Carefully tuned the P, I, and D constants for that one joint until its movement is fast, accurate and stable with minimal overshoot or oscillation.
-  34. Expand to all joints: expand your software architecture to handle all six joints. Each jiont will need its own set of tuned PID constants.
+  34. Expand to all joints: expand your software architecture to handle all six joints. Each jiont will need its own set of tuned PID constants for that one joint until its movement is fast, accurate, and stable with minimal overshoot or oscillation.
+  35. Establish WiFi Connection: Write a MicroPython script that connects your Raspberry Pi Pico W, to your local WiFi network using your network's SSID and password.
+  36. Develop Wireless Command Interface: We will create a simple server on the Pico W. A great option is a basic web server that hosts a simple webpage with buttons like "Move Joint 1 Forward," "Home Robot," etc.
+  37. When I click a button on the webpage from another computer's browser, it will send a command to the Pico W.
+  38. Integrate Control and Network Code: Merge your PID control code with your new wireless server code. The server's job will be able to receive a wireless command and then call the appropriate function in your PID control Systen. (e.g., (joint=3, position=5000))
+  39. Implement Homing Sequence: Write a final routine that, on startup or when a "Home" command is received wireelssly, slowly moves each joint until its home switch is triggered. This is supposed to zero the encoder counts and give the robot a known starting position.
 
-# Goals
+## Goals
 Build a safe, reliable and fully wired custom controller box that can deliver power to all robotic components. Create a complete and accurate "pinout map" of the SCORBOT's 50-pin connector making the robot wiring fully understood. Then wire Micropython that achieves stable, precise and command-based control over all six joints of the SCORBOT arm.
 
-# Table Of Contents
-- [Project Overview]
-- [Objective]
-- [Goals]
-- [Methodology]
-- [Results]
-- [Key Findings]
-- [Visualizations]
-- [Future Work]
-- [Individual Contributions]
 
-# Visualizations
-Supplies:
+
+## Visualizations
+### Supplies:
 1. Controller: 1 x Raspberry Pi Pico W Microcontroller
 2. Power Supply: 1 x 12V 50A power supply
 3. Safety: 6 Way fused distribution block**
-4. Safety: 12-14 AWG wire**
+4. Safety: 12-14 AWG wire
 5. Blade Fuses.**
 6. Robot Arm Drivers: 6 x L28N H-bridge modules
 7. Conveyor Driver: 1 x 2-Relay Module
