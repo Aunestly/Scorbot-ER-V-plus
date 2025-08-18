@@ -4,6 +4,7 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 ## Table Of Contents
 - [Project Overview](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#project-overview)
 - [Possible Technologies](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#possible-technologies)
+- [Software](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#software)
 - [Safety Precautions](https://github.com/Aunestly/Scorbot-ER-V-plus?tab=readme-ov-file#safety-precautions)
 - [Objective](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
 - [Methodology](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#potential-methodology)
@@ -14,17 +15,24 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 - [Equipment](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#equipment)
 - [Future Work]()
 - [Individual Contributions]()
-
+- [Acknowledgement]()
 
 ## Project Overview
 Engineer, design and build a custom controller box from the ground up for a SCORBOT-ER V Plus robotic arm and conveyor belt system. The goal is to replace the original, outdated controller with a flexible, powerful, and cost effective system built on contemporary components and open-source software. 
 
 ## Possible Technologies
 - SCORBOT-ER V Plus
-- Thonny
-- Micropython
-- Gemini AI
+- H-Bridge Modules
+- MCP23017 I/O Expander
+- Optical Quadrature Encoders
+- Fused Power Distribution System
 - 
+## Software
+- Micropython 
+- Thonny IDE
+- Custom Libraies
+- Gemini AI
+
 ## Safety Precautions
 ### High Current
 - Risks: The 12V 50A power supply can deliver a huge amount of energy. A short circuit in your wiring or failed motor could cause wires to melt and components to burn out instantly.
@@ -123,3 +131,14 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
 10. Terminal Block: Weidu TB2506
 11. Soder bread board.
 12. Adafruit MCP23017 I2C GPIO Expander Breakout
+
+## Individual Contribution
+
+## Acknowledgement
+<p> I'd like to extend my sincere gratitiude to the entire team. This project would not have been possible without the ressources and support of CS Robotics Lab. Special thanks for providing access to the SCORBOT-ER V Plus Robotic arms, workbench space, and essential tools required for builiding the custom controller.Their generosity in providing the tools and supploes for the success of this project. The supportive and innovative environment of the lab was a constant source motivation </p>
+<p>
+I would like to acknowledge the assitance of GOogle's Gemini, a large language model, which was instrumental in the development of this project. The AI provided support in areas such as:
+- code generation for the m MicroPython control system,
+- debugging of hardware communication protocols,
+- conceptual brainstorming for the project's methodology,
+- drafting of project documentation. 
