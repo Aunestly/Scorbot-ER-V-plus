@@ -28,22 +28,22 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
 ## Safety Precautions
 ### High Current
 - Risks: The 12V 50A power supply can deliver a huge amount of energy. A short circuit in your wiring or failed motor could cause wires to melt and components to burn out instantly.
-   _Precaution:_ The fuse block and 5A blade fuses are our essential safety net. They are the first line of defense and will instantly cut the power to a faulty circuit before any serious damage can occur. Using thick 12-14 AWG for all 12V connections is also a critical part of this.
+ <br>  _Precaution:_ The fuse block and 5A blade fuses are our essential safety net. They are the first line of defense and will instantly cut the power to a faulty circuit before any serious damage can occur. Using thick 12-14 AWG for all 12V connections is also a critical part of this.
 
 ### Operator Error Protection
 - Risks: When controlling the arm manually with the joystick, a momonet of distraction or an accidental twitch could send the arm crashing into itself or its surroundings.
-  _Precaution:_ The "Dead Man's Switch" logic in the code is the most important operational safety feature. The arm should be programmed to be completely limp and powerless unless you are actively holding down the joysticks button. If you let go for any reason, the arm must freeze instantly
+ <br> _Precaution:_ The "Dead Man's Switch" logic in the code is the most important operational safety feature. The arm should be programmed to be completely limp and powerless unless you are actively holding down the joysticks button. If you let go for any reason, the arm must freeze instantly
 
 ### Software "Guardrails" 
 - Risks: If we accidentally write a command in our autonomous sequence that tells a joint to move past its physical limits (eg., move_joint_to_position(1,99999)). This will cause the arm to jam, stall the motor, and potentiallly break gears
-  _Precautions:_ Implement "soft stops" in our code from day one, our program must have a defined list of the safe minimum and maximum encoder values for each joint. Our move_to_joint_position() function must always check these limits before it starts moving the motor. If a command is outside the safe zone, the function should refuse to execute it and print an error message.
+<br>  _Precautions:_ Implement "soft stops" in our code from day one, our program must have a defined list of the safe minimum and maximum encoder values for each joint. Our move_to_joint_position() function must always check these limits before it starts moving the motor. If a command is outside the safe zone, the function should refuse to execute it and print an error message.
   
 - Risk: A command could tell a joint to move past its physical limits, causing the arm to jam, stall a motor, and potentially break a gear.
-  _Precaution:_ The "Soft Stops" in the code are essential. Our program must know the safe minimum and maximum encoder values for each joint. Before moving a motor , the code should always check if the joint is already at its limit. If so, the code should ignore the command.
+<br>  _Precaution:_ The "Soft Stops" in the code are essential. Our program must know the safe minimum and maximum encoder values for each joint. Before moving a motor , the code should always check if the joint is already at its limit. If so, the code should ignore the command.
 
 ## Emergency Stop Plan
-- Upload new code, and a hidden bug causes the arm to start moving erratically
-  _Precaution:_ Have a clear and immediate way to shut everything down. The easiest way is to have our 12V power supply plugged into a power strip with a switch. Keep the power strip within arm's reach at all times during testing. If anything goes wrong, you can slap the switch to cut all power to the motors. 
+- if I upload new code, and a hidden bug causes the arm to start moving erratically
+  <br>_Precaution:_ Have a clear and immediate way to shut everything down. The easiest way is to have our 12V power supply plugged into a power strip with a switch. Keep the power strip within arm's reach at all times during testing. If anything goes wrong, you can slap the switch to cut all power to the motors. 
 
 ## Objectives
 - Physically mount the Raspberry Pi Pico W, 6 H-Bridges, 1 x 2- Relay modules, fuse block, and buck converter into a single organzied enclosure.
