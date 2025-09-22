@@ -6,6 +6,7 @@ two vertical articulated robots, with five revolute joints. Gripper attached and
 - [Possible Technologies](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#possible-technologies)
 - [Software](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#software)
 - [Safety Precautions](https://github.com/Aunestly/Scorbot-ER-V-plus?tab=readme-ov-file#safety-precautions)
+- [Hardware Test]()
 - [Objective](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#objectives)
 - [Methodology](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#potential-methodology)
 - [Goals](https://github.com/Aunestly/Scorbot-ER-V-plus/blob/main/README.md#goals)
@@ -52,6 +53,29 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
 ## Emergency Stop Plan
 - if I upload new code, and a hidden bug causes the arm to start moving erratically
   <br><br> _Precaution:_ Have a clear and immediate way to shut everything down. The easiest way is to have our 12V power supply plugged into a power strip with a switch. Keep the power strip within arm's reach at all times during testing. If anything goes wrong, I can slap the switch to cut all power to the motors. 
+# Main Power Circuit (12V): 
+# Provides the high-current power to drive the motor
+- 12V PSU (+) Terminal → Fuse Block Main Positive Input.
+- 12V PSU(-) Terminal → Fuse Block Main Negative Input
+- Fuse Block Fused Output → H-Bridge B+ (Battery Positive) screw terminal.
+- Fuse Block Negative Bus Bar → H-bridge B- (Battery Negative) screw terminal
+# Logic Power Circuit (5V): 
+# Provides the brain of your H-bridge module.
+- Pico W VBUS Pin → H-bridge VCC pin.
+# Control Signals Circuit: 
+# The command wires from the pico’s brain to the H-bridge.
+- Jumper Wires from Pico W GP14 → H-Bridge RPWM 
+- Jumper Wires from Pico W GP13 → H-Bridge LPWM
+- Jumper Wires from Pico W GP16 → H-Bridge R_EN (Right Enable)
+- Jumper Wires from Prico W GP17 → H-Bridge L_EN(Left Enable)
+## Motor Output Circuit: 
+# The final path where switched power travels to the motor
+- H-Bridge Motor Positive → DB50 Breakout Terminal #17
+- H-Bridge Motor Negative → DB50 Breakout Terminal #50
+# Shared Ground
+# Provides the high-current power to drive the motor
+- A jumper wire from PICO W GND Pin to the Fuse Blocks Negative Bus Bar.
+- A jumper wire from PICO W GND Pin to H-Bridge GND Pin.
 
 ## Objectives
 - Physically mount the Raspberry Pi Pico W, 6 H-Bridges, 1 x 2- Relay modules, fuse block, and buck converter into a single organzied enclosure.
