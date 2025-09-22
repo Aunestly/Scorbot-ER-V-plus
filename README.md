@@ -53,6 +53,7 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
 ## Emergency Stop Plan
 - if I upload new code, and a hidden bug causes the arm to start moving erratically
   <br><br> _Precaution:_ Have a clear and immediate way to shut everything down. The easiest way is to have our 12V power supply plugged into a power strip with a switch. Keep the power strip within arm's reach at all times during testing. If anything goes wrong, I can slap the switch to cut all power to the motors. 
+# Hardware Test
 # Main Power Circuit (12V): 
 # Provides the high-current power to drive the motor
 - 12V PSU (+) Terminal → Fuse Block Main Positive Input.
