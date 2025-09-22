@@ -1,0 +1,36 @@
+# Hardware test W/ Fuse Block:
+- 1x Raspberry Pi Pico W on a breadboard
+- 1x H-Bridge module (the one with B+/B-/M+/M- terminals)
+- 1x SCORBOT arm connected to your DB50 breakout board
+- 1x 12V Power Supply
+- 1x Digital Multimeter
+- 7x Jumper Wires
+- 1x Micro-USB cable and a computer with Thonny
+- 6x 12-AWG wire
+- 1x 6-way fuse block
+- 1x 5A fuse
+- 10x Terminal connectors
+
+Main Power Circuit (12V): 
+Provides the high-current power to drive the motor
+12V PSU (+) Terminal → Fuse Block Main Positive Input.
+12V PSU(-) Terminal → Fuse Block Main Negative Input
+Fuse Block Fused Output → H-Bridge B+ (Battery Positive) screw terminal.
+Fuse Block Negative Bus Bar → H-bridge B- (Battery Negative) screw terminal
+Logic Power Circuit (5V): 
+Provides the brain of your H-bridge module.
+Pico W VBUS Pin → H-bridge VCC pin.
+Control Signals Circuit: 
+The command wires from the pico’s brain to the H-bridge.
+Jumper Wires from Pico W GP14 → H-Bridge RPWM 
+Jumper Wires from Pico W GP13 → H-Bridge LPWM
+Jumper Wires from Pico W GP16 → H-Bridge R_EN (Right Enable)
+Jumper Wires from Prico W GP17 → H-Bridge L_EN(Left Enable)
+Motor Output Circuit: 
+The final path where switched power travels to the motor
+H-Bridge Motor Positive → DB50 Breakout Terminal #17
+H-Bridge Motor Negative → DB50 Breakout Terminal #50
+Shared Ground
+Provides the high-current power to drive the motor
+A jumper wire from PICO W GND Pin to the Fuse Blocks Negative Bus Bar.
+A jumper wire from PICO W GND Pin to H-Bridge GND Pin.
