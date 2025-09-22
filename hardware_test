@@ -12,7 +12,7 @@
 - 10x Terminal connectors
 
 ## Main Power Circuit (12V): 
-#Provides the high-current power to drive the motor
+# Provides the high-current power to drive the motor
 - 12V PSU (+) Terminal → Fuse Block Main Positive Input.
 - 12V PSU(-) Terminal → Fuse Block Main Negative Input
 - Fuse Block Fused Output → H-Bridge B+ (Battery Positive) screw terminal.
