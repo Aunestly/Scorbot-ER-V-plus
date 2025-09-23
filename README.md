@@ -55,26 +55,26 @@ Engineer, design and build a custom controller box from the ground up for a SCOR
   <br><br> _Precaution:_ Have a clear and immediate way to shut everything down. The easiest way is to have our 12V power supply plugged into a power strip with a switch. Keep the power strip within arm's reach at all times during testing. If anything goes wrong, I can slap the switch to cut all power to the motors. 
 # Hardware Test
 ## Main Power Circuit (12V): 
-## Provides the high-current power to drive the motor
+<i> Provides the high-current power to drive the motor</i>
 - 12V PSU (+) Terminal → Fuse Block Main Positive Input.
 - 12V PSU(-) Terminal → Fuse Block Main Negative Input
 - Fuse Block Fused Output → H-Bridge B+ (Battery Positive) screw terminal.
 - Fuse Block Negative Bus Bar → H-bridge B- (Battery Negative) screw terminal
 ## Logic Power Circuit (5V): 
-## Provides the brain of your H-bridge module.
+<i> Provides the brain of your H-bridge module.</i>
 - Pico W VBUS Pin → H-bridge VCC pin.
 ## Control Signals Circuit: 
-## The command wires from the pico’s brain to the H-bridge.
+<i> The command wires from the pico’s brain to the H-bridge.</i>
 - Jumper Wires from Pico W GP14 → H-Bridge RPWM 
 - Jumper Wires from Pico W GP13 → H-Bridge LPWM
 - Jumper Wires from Pico W GP16 → H-Bridge R_EN (Right Enable)
 - Jumper Wires from Prico W GP17 → H-Bridge L_EN(Left Enable)
 ## Motor Output Circuit: 
-## The final path where switched power travels to the motor
+<i> The final path where switched power travels to the motor</i>
 - H-Bridge Motor Positive → DB50 Breakout Terminal #17
 - H-Bridge Motor Negative → DB50 Breakout Terminal #50
 ## Shared Ground
-## Provides the high-current power to drive the motor
+<i> Provides the high-current power to drive the motor</i>
 - A jumper wire from PICO W GND Pin to the Fuse Blocks Negative Bus Bar.
 - A jumper wire from PICO W GND Pin to H-Bridge GND Pin.
 
