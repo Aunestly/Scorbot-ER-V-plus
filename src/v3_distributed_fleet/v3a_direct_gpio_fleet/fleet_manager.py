@@ -1,60 +1,71 @@
-# File: fleet_manager.py (Phase 3A - Direct Drive Prototype)
+# File: fleet_manager.py (Phase 3A - Dual Direct Drive)
+# Orchestrates two Picos (ARM_1 and ARM_2) simultaneously.
 import serial
 import time
 import glob
 
-def find_robot_port():
-    """Scans USB ports to find a Pico responding as ARM_1"""
+def find_fleet():
+    """Scans USB ports to find both ARM_1 and ARM_2"""
+    fleet = {}
     ports = glob.glob('/dev/ttyACM*')
-    print(f"Scanning ports: {ports}")
+    print(f"Scanning USB ports: {ports}")
     
     for port in ports:
         try:
             s = serial.Serial(port, 115200, timeout=2)
-            time.sleep(2) # Wait for Pico to reboot/ready
+            time.sleep(2) # Wait for Pico reboot
             s.reset_input_buffer()
             
-            # The Handshake
-            print(f"Pinging {port}...")
+            # Handshake
             s.write(b"WHO_ARE_YOU\n")
             s.flush()
-            
             response = s.readline().decode().strip()
-            print(f"Response: {response}")
             
             if "ARM_1" in response:
-                return s
-            s.close()
-        except Exception as e:
-            print(f"Error on {port}: {e}")
-    return None
+                print(f"Found ARM_1 at {port}")
+                fleet['ARM_1'] = s
+            elif "ARM_2" in response:
+                print(f"Found ARM_2 at {port}")
+                fleet['ARM_2'] = s
+            else:
+                s.close()
+        except:
+            pass
+    return fleet
 
 # --- MAIN MISSION ---
-print(">>> LAUNCHING PHASE 3A: DIRECT DRIVE FLEET <<<")
-robot = find_robot_port()
+print(">>> LAUNCHING PHASE 3A: DUAL ARM DIRECT DRIVE <<<")
+robots = find_fleet()
 
-if robot:
-    print("\n[SUCCESS] Connected to ARM_1 via Direct GPIO Mode.")
+if 'ARM_1' in robots and 'ARM_2' in robots:
+    arm1 = robots['ARM_1']
+    arm2 = robots['ARM_2']
+    print("\n[SUCCESS] Both Arms Online. Starting Synchronized Test.")
     time.sleep(1)
 
-    # Test Sequence: Base & Shoulder Only (Due to Pin Limits)
-    cmds = [
-        ("MOVE_BASE_FWD", 1.0),
-        ("STOP", 0.5),
-        ("MOVE_BASE_BACK", 1.0),
-        ("STOP", 0.5),
-        ("MOVE_SHOULDER_FWD", 0.5),
-        ("STOP", 0.5)
-    ]
+    # Sequence: Move Arm 1, then Arm 2, then Both
+    print("1. Moving Arm 1 Base...")
+    arm1.write(b"MOVE_BASE_FWD\n")
+    time.sleep(1.0)
+    arm1.write(b"STOP\n")
 
-    for cmd, duration in cmds:
-        print(f"Sending: {cmd} for {duration}s")
-        robot.write(f"{cmd}\n".encode())
-        time.sleep(duration)
+    print("2. Moving Arm 2 Base...")
+    arm2.write(b"MOVE_BASE_BACK\n")
+    time.sleep(1.0)
+    arm2.write(b"STOP\n")
     
-    # Final Stop
-    robot.write(b"STOP\n")
-    robot.close()
+    print("3. Moving BOTH (Multitasking)...")
+    arm1.write(b"MOVE_SHOULDER_FWD\n")
+    arm2.write(b"MOVE_SHOULDER_FWD\n")
+    time.sleep(1.0)
+    
+    print("4. Stopping Fleet.")
+    arm1.write(b"STOP\n")
+    arm2.write(b"STOP\n")
+    
+    arm1.close()
+    arm2.close()
     print("Mission Complete.")
+
 else:
-    print("[FAIL] No robot found. Is the Pico running the Phase 3A code?")
+    print(f"[FAIL] Incomplete Fleet. Found: {list(robots.keys())}")
