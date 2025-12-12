@@ -17,31 +17,40 @@ This repository is organized by engineering phase, documenting the evolution fro
 ```text
 SCORBOT-ER-V-Plus-Modernization/
 │
-├── README.md                  # Project Overview, Methodologies & Full Documentation
+├── README.md                          # The Main Executive Summary (Portfolio Landing Page)
 │
-├── src/                       # Source Code by Development Phase
-│   ├── v1_hardware_validation/# PHASE 1: Component Verification
-│   │   ├── blink_test.py
-│   │   ├── motor_test_class.py
-│   │   └── encoder_finder.py
+├── src/                               # Source Code Repository
 │   │
-│   ├── v2_standalone_control/ # PHASE 2: Direct GPIO Sequencing (Laptop)
-│   │   ├── 4cycle.py          # The 4-cycle loop with active braking
-│   │   └── README_v2.md
+│   ├── v1_hardware_validation/        # PHASE 1: Component Verification
+│   │   ├── blink_test.py              # Simple LED test
+│   │   ├── motor_test_class.py        # Single motor class test
+│   │   └── encoder_finder.py          # Script to identify A/B encoder phases
 │   │
-│   ├── v3_distributed_fleet/  # PHASE 3: Distributed Architecture (Pi 4 + Pico)
-│   │   ├── raspberry_pi_4/    # The "Brain" Code (Fleet Manager)
-│   │   │   └── fleet_manager.py
-│   │   └── pico_w/            # The "Spinal Cord" Code (Listeners)
-│   │       ├── main.py        
-│   │       └── mcp23017.py    
+│   ├── v2_standalone_control/         # PHASE 2: Single Arm Prototype (Laptop Controlled)
+│   │   ├── README.md                  # Doc: Explains the "Direct Drive" wiring (Hardwired Enables)
+│   │   └── 4cycle.py                  # The Open-Loop "Forward/Back" validation loop
 │   │
-│   └── v4_autonomy_vision/    # PHASE 4: Computer Vision (Future)
-│       ├── training_data/
-│       └── vision_control.py
+│   ├── v3_distributed_fleet/          # PHASE 3: The Fleet Architecture
+│   │   ├── README.md                  # Doc: Explains evolution from 3A (Direct) to 3B (Expander)
+│   │   │
+│   │   ├── v3a_direct_gpio_fleet/     # SUB-PHASE 3A: The "Pin-Constrained" Prototype
+│   │   │   ├── fleet_manager.py       # Python: Controls 2 Picos, runs 4-motor sequence
+│   │   │   └── pico_code/             # MicroPython: Code for the Picos
+│   │   │       └── main.py            # Listener: Controls motors via GP0-GP7 (Direct)
+│   │   │
+│   │   └── v3b_io_expander_fleet/     # SUB-PHASE 3B: The "Production" System (Scalable)
+│   │       ├── fleet_manager.py       # Python: Complex mission (Arm 1 Base -> Arm 2 Task)
+│   │       └── pico_code/             # MicroPython: Code for the Picos
+│   │           ├── mcp23017.py        # Library: The I2C Driver (Standard for both)
+│   │           ├── main_arm1.py       # Arm 1 Logic: Hybrid (Expander + Direct Pins)
+│   │           └── main_arm2.py       # Arm 2 Logic: Dual Expander (0x20, 0x21)
+│   │
+│   └── v4_autonomy_vision/            # PHASE 4: Computer Vision (Future Roadmap)
+│       ├── training_data/             # Placeholder for images
+│       └── vision_control.py          # Placeholder for logical control
 │
-└── tests/                     # Validation Logs & Evidence
-    └── logs/                  # Terminal outputs proving successful handshakes
+└── tests/                             # Verification Logs
+    └── logs/                          # Save your "Terminal Output" text files here
 ```
 
 -----
