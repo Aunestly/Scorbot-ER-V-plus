@@ -23,16 +23,15 @@ This is the core validation script for this phase. It implements an **Open-Loop 
 4.  **Stop:** Full system idle.
 
 ## 🔌 Wiring Map (Prototype)
-*This mapping is specific to the Phase 2 validation prototype and differs from the final Phase 3 production mapping.*
+*This mapping is specific to the Phase 2 validation prototype. Note that the Enable pins are "Hard-Wired" High to save GPIO pins.*
 
-| Motor | Pico Pin (RPWM) | Pico Pin (LPWM) | Logic |
-| :--- | :--- | :--- | :--- |
-| **Base** | GP0 | GP1 | Direct Drive |
-| **Shoulder** | GP2 | GP3 | Direct Drive |
-| **Elbow** | GP4 | GP5 | Direct Drive |
-| **Gripper** | GP6 | GP7 | Direct Drive |
+| Motor | Pico Pin (RPWM) | Pico Pin (LPWM) | R_EN & L_EN | Logic |
+| :--- | :--- | :--- | :--- | :--- |
+| **Base** | GP0 | GP1 | **3.3V (Physical Pin 36)** | Direct Drive |
+| **Shoulder** | GP2 | GP3 | **3.3V (Physical Pin 36)** | Direct Drive |
+| **Elbow** | GP4 | GP5 | **3.3V (Physical Pin 36)** | Direct Drive |
+| **Gripper** | GP6 | GP7 | **3.3V (Physical Pin 36)** | Direct Drive |
 
-## ✅ Validation Results
-* Confirmed BTS7960 drivers can sustain stall currents without overheating.
-* Calculated approximate "Inch per Second" travel rates for open-loop timing.
-* Verified that "Active Braking" is required for precise positioning due to the arm's momentum.
+**Wiring Note:**
+* All `R_EN` and `L_EN` pins from all 4 drivers were daisy-chained together and connected to the single **3.3V (OUT)** pin on the Pico.
+* This keeps the drivers "Armored" (Enabled) 100% of the time, allowing `RPWM` and `LPWM` to handle all motion and braking logic.
