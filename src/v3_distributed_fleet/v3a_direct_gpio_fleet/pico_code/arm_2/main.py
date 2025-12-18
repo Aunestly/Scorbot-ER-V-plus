@@ -69,3 +69,5 @@ while True:
             base.stop(); shoulder.stop(); elbow.stop(); gripper.stop()
             
     time.sleep(0.01)
+
+
