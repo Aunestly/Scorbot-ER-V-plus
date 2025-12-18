@@ -1,5 +1,4 @@
-# fleet_manager.py
-# Run this on the Raspberry Pi 4
+# File: fleet_manager.py (Run on Raspberry Pi 4)
 import serial
 import time
 import glob
@@ -11,94 +10,97 @@ def find_robots():
     
     for port in ports:
         try:
-            # Connect to port
             s = serial.Serial(port, 115200, timeout=2)
-            time.sleep(2) # Wait for Pico to reboot
+            time.sleep(2) 
             s.reset_input_buffer()
             
-            # HANDSHAKE (The Standard Command)
-            s.write(b"IDENTIFY\n")
-            time.sleep(0.1)
+            # --- THE CORRECT HANDSHAKE YOU WANTED ---
+            s.write(b"WHO_ARE_YOU\n")
+            s.flush()
             
-            # Robust Check (Read 5 lines to skip boot messages)
-            for i in range(5):
+            # Read multiple lines to skip boot messages
+            for i in range(5): 
                 line = s.readline().decode('utf-8').strip()
-                if "ARM_1" in line:
+                if "ARM_1" in line: 
                     robots['ARM_1'] = s
                     print(f" -> Found ARM_1 on {port}")
                     break
-                elif "ARM_2" in line:
+                elif "ARM_2" in line: 
                     robots['ARM_2'] = s
                     print(f" -> Found ARM_2 on {port}")
                     break
-                    
-        except Exception as e:
-            print(f" -> Error on {port}: {e}")
-            
+        except: 
+            pass
     return robots
 
-# --- MAIN EXECUTION ---
 print(">>> INITIALIZING FLEET <<<")
 fleet = find_robots()
 
 if 'ARM_1' in fleet and 'ARM_2' in fleet:
-    print("\n--- FLEET READY: ALL SYSTEMS GO ---")
+    print("\n--- FLEET READY ---")
     arm1 = fleet['ARM_1']
     arm2 = fleet['ARM_2']
     
     # ==========================================
-    # MISSION 1: ARM 1 BASE SHAKE (Validation)
+    # MISSION 1: ARM 1 BASE TEST (2 Cycles)
     # ==========================================
-    print("\n[MISSION 1] Testing Arm 1 Base...")
-    arm1.write(b"MOVE_BASE_FWD\n")
-    time.sleep(1.0)
-    arm1.write(b"STOP\n")
-    time.sleep(0.2)
-    
-    arm1.write(b"MOVE_BASE_BACK\n")
-    time.sleep(1.0)
-    arm1.write(b"STOP\n")
-    print(" -> Arm 1 Test Complete.")
-    
-    # ==========================================
-    # MISSION 2: ARM 2 COMPLEX 4-CYCLE
-    # ==========================================
-    print("\n[MISSION 2] Starting Arm 2 Production Cycle...")
-    LOOPS = 4
-    
-    for i in range(LOOPS):
-        print(f" -> Cycle {i+1}/{LOOPS}")
-        
-        # 1. Base Turn
-        arm2.write(b"MOVE_BASE_FWD\n")
+    print("\n[MISSION 1] Testing Arm 1 Base (2 Cycles)...")
+    for i in range(2):
+        print(f" > Cycle {i+1}: Forward")
+        arm1.write(b"MOVE_BASE_FWD\n")
         time.sleep(2.0)
-        arm2.write(b"HOLD_BASE\n") 
+        arm1.write(b"STOP\n")
         time.sleep(0.5)
         
-        # 2. Extend
-        arm2.write(b"EXTEND_ARM\n")
-        time.sleep(1.5)
-        arm2.write(b"HOLD_ARM\n")
+        print(f" > Cycle {i+1}: Backward")
+        arm1.write(b"MOVE_BASE_BACK\n")
+        time.sleep(2.0)
+        arm1.write(b"STOP\n")
         time.sleep(0.5)
-        
-        # 3. Grip
-        arm2.write(b"GRIPPER_CLOSE\n")
-        time.sleep(1.0)
-        arm2.write(b"HOLD_GRIPPER\n")
-        
-        # 4. Return Home (Simultaneous)
-        arm2.write(b"MOVE_BASE_BACK\n")
-        arm2.write(b"RETRACT_ARM\n")
-        time.sleep(1.5) # Wait for arm
-        arm2.write(b"HOLD_ARM\n")
-        time.sleep(0.5) # Wait for base
-        arm2.write(b"HOLD_BASE\n")
-        
-        # 5. Release
-        arm2.write(b"GRIPPER_OPEN\n")
-        time.sleep(1.0)
-        arm2.write(b"HOLD_GRIPPER\n")
-        time.sleep(1.0)
+    
+    print("[MISSION 1] Complete.")
+    time.sleep(1.0)
+
+    # ==========================================
+    # MISSION 2: ARM 2 COMPLEX SEQUENCE
+    # ==========================================
+    print("\n[MISSION 2] Starting Arm 2 Task...")
+    
+    # 1. Base Forward + Hold
+    print(" > Moving Base...")
+    arm2.write(b"MOVE_BASE_FWD\n")
+    time.sleep(2.0)
+    arm2.write(b"HOLD_BASE\n")
+    time.sleep(0.5)
+    
+    # 2. Extend Arm
+    print(" > Extending...")
+    arm2.write(b"EXTEND_ARM\n")
+    time.sleep(1.5)
+    arm2.write(b"HOLD_ARM\n")
+    time.sleep(0.5)
+    
+    # 3. Grip
+    print(" > Gripping...")
+    arm2.write(b"GRIPPER_CLOSE\n")
+    time.sleep(1.0)
+    arm2.write(b"HOLD_GRIPPER\n")
+    time.sleep(0.5)
+    
+    # 4. Return (Simultaneous)
+    print(" > Returning...")
+    arm2.write(b"MOVE_BASE_BACK\n")
+    arm2.write(b"RETRACT_ARM\n")
+    time.sleep(1.5) # Arm travel time
+    arm2.write(b"HOLD_ARM\n")
+    time.sleep(0.5) # Remaining base travel
+    arm2.write(b"HOLD_BASE\n")
+    
+    # 5. Release
+    print(" > Releasing...")
+    arm2.write(b"GRIPPER_OPEN\n")
+    time.sleep(1.0)
+    arm2.write(b"HOLD_GRIPPER\n")
 
     print("\n>>> ALL MISSIONS COMPLETE.")
     arm1.write(b"STOP\n")
@@ -107,5 +109,4 @@ if 'ARM_1' in fleet and 'ARM_2' in fleet:
     arm2.close()
 
 else:
-    print("\n[ERROR] Fleet Incomplete. Check connections.")
-    print(f"Found: {list(fleet.keys())}")
+    print("ERROR: Did not find both arms. Check USB cables.")
