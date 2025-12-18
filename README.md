@@ -22,7 +22,7 @@ SCORBOT-ER-V-Plus-Modernization/
 ├── src/                               # Source Code Repository
 │   │
 │   ├── v1_hardware_validation/        # PHASE 1: Component Verification
-│   │   ├── blink_test.py              # Simple LED test
+│   │   ├── blinkLED.py                # Simple LED test
 │   │   ├── motor_test_class.py        # Single motor class test
 │   │   └── encoder_finder.py          # Script to identify A/B encoder phases
 │   │
