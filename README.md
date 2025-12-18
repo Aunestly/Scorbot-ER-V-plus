@@ -31,7 +31,10 @@ SCORBOT-ER-V-Plus-Modernization/
 │   │   └── 4cycle.py                  # The Open-Loop "Forward/Back" validation loop
 │   │
 │   ├── v3_distributed_fleet/          # PHASE 3: The Fleet Architecture
-│   │   ├── README.md                  # Doc: Explains evolution from 3A (Direct) to 3B (Expander)
+│   │   ├──  README.md                 # Doc: Explains evolution from 3A (Direct) to 3B (Expander)
+|   |   └──  Setup                     # Activation: Fleet code setup for Raspberry Pi 4 -> Pi Pico W's
+|   |   |    ├─ main.py                # Listener Code: Spinal Cord setup for both Pico W's
+|   |   |    └─ robot_commander.py     # Commander: Setup for commanding Rasberry Pi Pico's. 
 │   │   │
 │   │   ├── v3a_direct_gpio_fleet/     # SUB-PHASE 3A: The "Pin-Constrained" Prototype
 │   │   │   ├── fleet_manager.py       # Python: Controls 2 Picos, runs 4-motor sequence
