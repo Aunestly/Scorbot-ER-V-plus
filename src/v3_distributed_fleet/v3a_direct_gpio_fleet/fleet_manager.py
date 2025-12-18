@@ -1,12 +1,13 @@
-# File: fleet_manager.py (Run on Raspberry Pi 4)
-# Mission: Arm 1 Base Warmup -> Arm 2 Complex Task
+# Role: Commander
+# fleet_manager.py (on Pi 4)
 
 import serial
 import time
 import glob
 
 def find_robots():
-    """ Scans ports and identifies robots by ID """
+    # Scans all usb serial ports and asks connected devices for IDs
+    # Returns dictionary
     robots = {}
     ports = glob.glob('/dev/ttyACM*')
     print(f"Scanning USB ports: {ports}...")
@@ -21,127 +22,148 @@ def find_robots():
             s.write(b"WHO_ARE_YOU\n")
             s.flush()
             
-            # Read loop to ignore echo
+            # --- READ LOOP TO IGNORE ECHO ---
             found_id = None
             for i in range(5):
                 line = s.readline().decode('utf-8').strip()
-                if line == "" or line == "WHO_ARE_YOU": continue
-                if "ARM_1" in line: found_id = "ARM_1"; break
-                elif "ARM_2" in line: found_id = "ARM_2"; break
+                # Ignore empty lines or the echo of the command itself
+                if line == "" or line == "WHO_ARE_YOU":
+                    continue
+                if "ARM_1" in line:
+                    found_id = "ARM_1"
+                    break
+                elif "ARM_2" in line:
+                    found_id = "ARM_2"
+                    break
+            # -------------------------------
 
             print(f" Identity: {found_id}")
             
-            if found_id:
-                robots[found_id] = s
+            if found_id == "ARM_1":
+                robots['ARM_1'] = s
+            elif found_id == "ARM_2":
+                robots['ARM_2'] = s
             else:
+                print(f"  -> Warning: No valid ID found.")
                 s.close()
+                
         except Exception as e:
-            print(f" Error: {e}")
+            print(f"\n  -> Error on {port}: {e}")
             
     return robots
 
-# --- MAIN MISSION ---
-print(">>> INITIALIZING FLEET <<<")
+#main mission sequence
+print(">>>Initializing robot fleet")
 fleet = find_robots()
 
+#check if we found both arms
+# Check if we found both arms
 if 'ARM_1' in fleet and 'ARM_2' in fleet:
-    print("\n--- FLEET READY ---")
+    print("\n--- FLEET READY: BOTH ARMS ONLINE ---")
     arm1 = fleet['ARM_1']
     arm2 = fleet['ARM_2']
     
-    # ==================================================
-    # PHASE 1: ARM 1 (Base Cycles)
-    # ==================================================
-    print("\n[PHASE 1] Starting Arm 1 Base Cycles...")
+    # --- SKIPPING ARM 1 (Save for later) ---
+    print("[Mission] Skipping Arm 1 (Maintenance Mode)...")
+    # arm1.write(b"MOVE_BASE_FWD\n") 
+    # time.sleep(2.0)
+    # arm1.write(b"STOP\n")
     
-    # Loop 2 times as requested
-    for i in range(2):
-        print(f"   >>> Arm 1 Cycle {i+1}/2")
-        
-        # Move Forward
-        arm1.write(b"MOVE_BASE_FWD\n")
-        time.sleep(2.0)
-        
-        # Stop briefly
-        arm1.write(b"STOP\n")
-        time.sleep(0.5)
-        
-        # Move Backward
-        arm1.write(b"MOVE_BASE_BACK\n")
-        time.sleep(2.0)
-        
-        # Stop
-        arm1.write(b"STOP\n")
-        time.sleep(0.5)
-        
-    print("[PHASE 1] Arm 1 Complete. Switching to Arm 2...")
-    time.sleep(1.0)
-
-    # ==================================================
-    # PHASE 2: ARM 2 (Complex Sequence)
-    # ==================================================
-    print("\n[PHASE 2] Starting Arm 2 Sequence...")
+    # --- MISSION: MOVE ARM 2 ---
+    print("\n[Mission] Commanding Arm 2 (Direct GPIO)...")
     
-    # Configuration for Arm 2 sequence
-    LOOPS = 2
+    # 1. Move Base Forward
+    print(">>> Arm 2: Moving Base Forward")
+    arm2.write(b"MOVE_BASE_FWD\n")
+    time.sleep(3.0)
+    
+    # 2. Stop
+    print(">>> Arm 2: Stopping")
+    arm2.write(b"STOP\n")
+    time.sleep(0.5)
+    
+    # 3. Move Base Backward
+    print(">>> Arm 2: Moving Base Backward")
+    arm2.write(b"MOVE_BASE_BACK\n")
+    time.sleep(3.0)
+    
+    # 4. Final Stop
+    print(">>> Arm 2: Stopping")
+    arm2.write(b"STOP\n")
+    
+    print("\n>>> Mission Complete.")
+    
+    # Clean up connections
+    arm1.close()
+    arm2.close()
+    
+elif 'ARM_1' in fleet:
+    print("\n-- PARTIAL FLEET: ONLY ARM 1 FOUND...")
+    fleet['ARM_1'].write(b"BLINK\n")
+    fleet['ARM_1'].close()
+elif 'ARM_2' in fleet:
+    print("\n--- PARTIAL FLEET: ONLY ARM 2 FOUND ---")
+    arm2 = fleet['ARM_2']
+    
+    # --- CONFIGURATION ---
+    LOOPS = 4
     BASE_TIME = 2.0
     ARM_TIME = 1.2
     GRIP_TIME = 0.8
     
+    print(f"Starting {LOOPS}-Cycle Sequence...")
+    time.sleep(2)
+    
     for i in range(LOOPS):
-        print(f"\n   >>> Arm 2 Cycle {i+1}/{LOOPS}")
+        print(f"\n=== CYCLE {i+1} of {LOOPS} ===")
         
-        # 1. Base Forward + Hold
+        # 1. BASE TURN
+        print(">>> 1. Base Turning...")
         arm2.write(b"MOVE_BASE_FWD\n")
         time.sleep(BASE_TIME)
-        arm2.write(b"HOLD_BASE\n")
+        arm2.write(b"HOLD_BASE\n") 
         time.sleep(0.5)
         
-        # 2. Extend Arm
+        # 2. EXTEND ARM
+        print(">>> 2. Extending Arm...")
         arm2.write(b"EXTEND_ARM\n")
         time.sleep(ARM_TIME)
         arm2.write(b"HOLD_ARM\n")
         time.sleep(0.5)
         
-        # 3. Grip
+        # 3. GRIP
+        print(">>> 3. Closing Gripper...")
         arm2.write(b"GRIPPER_CLOSE\n")
         time.sleep(GRIP_TIME)
         arm2.write(b"HOLD_GRIPPER\n")
         time.sleep(0.5)
         
-        # 4. Simultaneous Return (The cool part!)
-        print("      (Simultaneous Return...)")
+        # 4. SIMULTANEOUS RETURN
+        print(">>> 4. Returning Home (Simultaneous)...")
         arm2.write(b"MOVE_BASE_BACK\n")
         arm2.write(b"RETRACT_ARM\n")
         
-        # Wait for Arm (shorter) then stop it
         time.sleep(ARM_TIME)
-        arm2.write(b"HOLD_ARM\n")
+        arm2.write(b"HOLD_ARM\n") 
         
-        # Wait for Base (longer) then stop it
         remaining = BASE_TIME - ARM_TIME
         if remaining > 0:
             time.sleep(remaining)
+        
         arm2.write(b"HOLD_BASE\n")
         time.sleep(0.5)
         
-        # 5. Release
+        # 5. RELEASE
+        print(">>> 5. Releasing...")
         arm2.write(b"GRIPPER_OPEN\n")
         time.sleep(GRIP_TIME)
         arm2.write(b"HOLD_GRIPPER\n")
-        time.sleep(1.0)
+        time.sleep(1.0) 
 
-    # ==================================================
-    # SHUTDOWN
-    # ==================================================
-    print("\n>>> ALL MISSIONS COMPLETE.")
-    arm1.write(b"STOP\n")
-    arm2.write(b"STOP_ALL\n") # Ensures Arm 2 cuts brake power
-    
-    arm1.close()
+    print("\n>>> Sequence Complete. Shutting down.")
+    arm2.write(b"STOP_ALL\n") 
     arm2.close()
 
 else:
-    print("\n[ERROR] Did not find both arms.")
-    print(f"Found: {list(fleet.keys())}")
+    print("\n[ERROR] No robots found! Check USB Cables.")
 
