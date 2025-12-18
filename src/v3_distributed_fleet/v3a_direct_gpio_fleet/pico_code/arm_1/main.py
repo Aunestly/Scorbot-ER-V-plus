@@ -19,28 +19,38 @@ class Motor:
         self.stop()
 
     def forward(self):
+        # Enable = 1, RPWM = 0, LPWM = 1
         self.r_en.value(1); self.l_en.value(1)
         self.rpwm.value(0); self.lpwm.value(1)
 
     def backward(self):
+        # Enable = 1, RPWM = 1, LPWM = 0
         self.r_en.value(1); self.l_en.value(1)
         self.rpwm.value(1); self.lpwm.value(0)
 
+    def hold(self):
+        # Active Braking: Enable = 1, PWM = 0
+        self.r_en.value(1); self.l_en.value(1)
+        self.rpwm.value(0); self.lpwm.value(0)
+
     def stop(self):
+        # Coasting: Everything OFF
         self.r_en.value(0); self.l_en.value(0)
         self.rpwm.value(0); self.lpwm.value(0)
 
 # --- MOTOR DEFINITIONS ---
-# Base pins for Arm 1 
-base = Motor("Base", 14, 13, 16, 17)
+# Pins match the code you provided earlier for Arm 1
+# Motor("Name", RPWM, LPWM, R_EN, L_EN)
+base = Motor("Base", 14, 13, 16, 17) 
 
 print(f"{ROBOT_ID}_READY")
 
 while True:
+    # Check for incoming commands
     if select.select([sys.stdin], [], [], 0)[0]:
         cmd = sys.stdin.readline().strip()
         
-        # --- THE CORRECT HANDSHAKE ---
+        # --- HANDSHAKE ---
         if cmd == "WHO_ARE_YOU":
             print(ROBOT_ID)
 
@@ -50,8 +60,11 @@ while True:
         elif cmd == "MOVE_BASE_BACK":
             base.backward()
         
-        # --- SAFETY ---
+        # --- SAFETY / HOLD ---
+        elif cmd == "HOLD_BASE":
+            base.hold()  # Active Braking
+            
         elif cmd == "STOP" or cmd == "STOP_ALL":
-            base.stop()
+            base.stop()  # Coast to stop
             
     time.sleep(0.01)
