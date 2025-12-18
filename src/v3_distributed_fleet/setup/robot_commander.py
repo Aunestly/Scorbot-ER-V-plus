@@ -1,7 +1,7 @@
 # File: robot_commander.py (Save on Raspberry Pi 4)
 # ROLE: BRAIN (Commander)
 # SAVE THIS CODE ON YOUR PI 4, under LOCAL Python 3
-# run this code so that it can now command the pico's to listen.
+# run this code so that the Pi 4 can now command the pico's to listen.
 
 import serial
 import time
