@@ -4,7 +4,7 @@
 # This code enables the picos to listen to the Pi 4, and take commands from it.
 # It should be saved as main.py, but main.py will change once you enable the pico
 # to take commands from the pi, by running this code.
-
+# This code will work for both arms if the pin outs are exactly the same.
 
 from machine import Pin
 import time
