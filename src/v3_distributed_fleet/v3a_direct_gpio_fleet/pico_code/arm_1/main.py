@@ -7,7 +7,7 @@ import time
 from machine import Pin
 
 # --- IDENTITY ---
-ROBOT_ID = "ARM_1"  # <--- IDENTIFIES THIS AS THE LEFT ROBOT
+ROBOT_ID = "ARM_1" 
 
 class Motor:
     def __init__(self, name, rpwm_pin, lpwm_pin, r_en_pin, l_en_pin):
@@ -19,7 +19,6 @@ class Motor:
         self.stop()
 
     def forward(self):
-        # Logic swapped per your setup
         self.r_en.value(1); self.l_en.value(1)
         self.rpwm.value(0); self.lpwm.value(1)
 
@@ -32,7 +31,7 @@ class Motor:
         self.rpwm.value(0); self.lpwm.value(0)
 
 # --- MOTOR DEFINITIONS ---
-# Base pins for Arm 1 (Verify these match your wiring!)
+# Base pins for Arm 1 
 base = Motor("Base", 14, 13, 16, 17)
 
 print(f"{ROBOT_ID}_READY")
@@ -41,6 +40,7 @@ while True:
     if select.select([sys.stdin], [], [], 0)[0]:
         cmd = sys.stdin.readline().strip()
         
+        # --- THE CORRECT HANDSHAKE ---
         if cmd == "WHO_ARE_YOU":
             print(ROBOT_ID)
 
@@ -51,13 +51,7 @@ while True:
             base.backward()
         
         # --- SAFETY ---
-        elif cmd == "STOP":
+        elif cmd == "STOP" or cmd == "STOP_ALL":
             base.stop()
             
     time.sleep(0.01)
-
-        elif line == "MOVE_SHOULDER_FWD": move_shoulder("FWD")
-        elif line == "MOVE_SHOULDER_BACK":move_shoulder("BACK")
-        
-        elif line == "STOP":
-            stop_all()
