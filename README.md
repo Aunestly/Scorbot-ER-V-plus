@@ -36,14 +36,15 @@ SCORBOT-ER-V-Plus-Modernization/
 │   │   ├── v3a_direct_gpio_fleet/     # SUB-PHASE 3A: The "Pin-Constrained" Prototype
 │   │   │   ├── fleet_manager.py       # Python: Controls 2 Picos, runs 4-motor sequence
 │   │   │   └── pico_code/             # MicroPython: Code for the Picos
-│   │   │       └── main.py            # Listener: Controls motors via GP0-GP7 (Direct)
+│   │   │       ├─ arm_1/main.py       # Listener: ARM 1 Controls motors via GP0-GP7 (Direct)
+|   |   |       └─ arm_2/main.py       # Listener: ARM 2 Controls motors via GP0-GP7
 │   │   │
 │   │   └── v3b_io_expander_fleet/     # SUB-PHASE 3B: The "Production" System (Scalable)
 │   │       ├── fleet_manager.py       # Python: Complex mission (Arm 1 Base -> Arm 2 Task)
 │   │       └── pico_code/             # MicroPython: Code for the Picos
 │   │           ├── mcp23017.py        # Library: The I2C Driver (Standard for both)
-│   │           ├── main_arm1.py       # Arm 1 Logic: Hybrid (Expander + Direct Pins)
-│   │           └── main_arm2.py       # Arm 2 Logic: Dual Expander (0x20, 0x21)
+│   │           ├── arm1/main.py       # Arm 1 Logic: Hybrid (Expander + Direct Pins)
+│   │           └── arm2/main.py       # Arm 2 Logic: Dual Expander (0x20, 0x21)
 │   │
 │   └── v4_autonomy_vision/            # PHASE 4: Computer Vision (Future Roadmap)
 │       ├── training_data/             # Placeholder for images
