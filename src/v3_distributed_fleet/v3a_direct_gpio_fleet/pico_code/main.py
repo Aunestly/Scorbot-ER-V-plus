@@ -1,6 +1,6 @@
 # File: main.py (Phase 3A - Direct GPIO Listener)
-# LOAD ON BOTH PICOS (Change ROBOT_ID for the second one)
-# or see other main.py code in this file.
+# LOAD CODE ON BOTH PICOS (Change ROBOT_ID for the second pico/arm to ARM_2)
+
 import sys
 import select
 from machine import Pin
