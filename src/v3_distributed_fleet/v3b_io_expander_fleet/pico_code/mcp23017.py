@@ -1,34 +1,46 @@
 # File: mcp23017.py
-# Description: Driver for MCP23017 I/O Expander
-# Save this on BOTH Picos.
+# Save this on the Pico. Do NOT run it.
+
+import time
 
 class MCP23017:
-    IODIRA = 0x00
-    IODIRB = 0x01
-    GPIOA = 0x12
-    GPIOB = 0x13
-
     def __init__(self, i2c, address=0x20):
         self.i2c = i2c
         self.address = address
-        # Initialize all pins as outputs (0x00)
-        try:
-            self.i2c.writeto_mem(self.address, self.IODIRA, b'\x00')
-            self.i2c.writeto_mem(self.address, self.IODIRB, b'\x00')
-        except OSError:
-            print(f"ERROR: Could not find Expander at {hex(address)}")
+        self.init()
 
-    def digital_write(self, pin, value):
-        # Maps 0-7 to Port A, 8-15 to Port B
-        reg = self.GPIOA if pin < 8 else self.GPIOB
-        pin_offset = pin % 8
-        
-        # Read current state so we don't mess up other pins
-        current_state = self.i2c.readfrom_mem(self.address, reg, 1)[0]
-        
-        if value == 1:
-            new_state = current_state | (1 << pin_offset)
-        else:
-            new_state = current_state & ~(1 << pin_offset)
-            
-        self.i2c.writeto_mem(self.address, reg, bytes([new_state]))
+    def init(self):
+        # Configure IODIR to 0 (all outputs) initially
+        self.write_reg(0x00, 0x00) # IODIRA
+        self.write_reg(0x01, 0x00) # IODIRB
+
+    def write_reg(self, reg, value):
+        self.i2c.writeto_mem(self.address, reg, bytes([value]))
+
+    def read_reg(self, reg):
+        return self.i2c.readfrom_mem(self.address, reg, 1)[0]
+
+    def pin(self, pin, mode=None, value=None):
+        # Determine port (A or B) and pin bit (0-7)
+        # Pins 0-7 are Port A, Pins 8-15 are Port B
+        reg_gpio = 0x12 if pin < 8 else 0x13
+        reg_iodir = 0x00 if pin < 8 else 0x01
+        bit = pin % 8
+
+        # Set Mode (0=Output, 1=Input) if provided
+        if mode is not None:
+            current_iodir = self.read_reg(reg_iodir)
+            if mode == 1:
+                new_iodir = current_iodir | (1 << bit)
+            else:
+                new_iodir = current_iodir & ~(1 << bit)
+            self.write_reg(reg_iodir, new_iodir)
+
+        # Set Value (0=Low, 1=High) if provided
+        if value is not None:
+            current_gpio = self.read_reg(reg_gpio)
+            if value == 1:
+                new_gpio = current_gpio | (1 << bit)
+            else:
+                new_gpio = current_gpio & ~(1 << bit)
+            self.write_reg(reg_gpio, new_gpio)
