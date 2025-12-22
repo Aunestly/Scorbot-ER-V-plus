@@ -1,92 +1,147 @@
-# File: main.py (For ARM 1 ONLY)
-# Hardware: 1 Expander + Direct Pins for Pitch/Roll
+# File: main.py (Save to ARM 1 Pico)
+# ROLE: BASE TURN AND ARM EXTEND CODE
+# this is the main file for arm when when running the sequence
+# connected directly to pico controls not io expnaders
+# Hardware: 2 Expanders (0x20, 0x21) connected to GP16/GP17
+# Hardware: Pins 16 (SDA) & 17 (SCL)
+# ID: ARM_1
+
 import sys
 import select
 import time
-from machine import Pin, I2C
+import machine
 from mcp23017 import MCP23017
 
 ROBOT_ID = "ARM_1"
 
-# --- I2C SETUP (For Expander 1) ---
-i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=400000)
-try:
-    exp1 = MCP23017(i2c, 0x20)
-except:
-    print("EXPANDER ERROR")
+# --- 1. I2C SETUP (SoftI2C on Pins 16/17) ---
+sda = machine.Pin(16)
+scl = machine.Pin(17)
+i2c = machine.SoftI2C(sda=sda, scl=scl, freq=100000)
 
-# --- MOTOR CLASSES ---
+print(f"{ROBOT_ID}: Booting up...")
 
-# Class for motors on the Expander (Base, Shoulder, Elbow, Gripper)
+# --- 2. CONNECTION LOOP (Only looks for 0x20) ---
+exp1 = None
+connected = False
+while not connected:
+    try:
+        devices = i2c.scan()
+        if 32 in devices: # Found 0x20
+            print("SUCCESS: Found Main Expander (0x20)!")
+            exp1 = MCP23017(i2c, 0x20) 
+            connected = True
+        else:
+            print(f" > Waiting for Expander... Found: {devices}")
+            time.sleep(2)
+    except:
+        time.sleep(2)
+
+# --- 3. MOTOR CLASSES ---
+
+# Class A: For motors on the Expander Chip
 class ExpanderMotor:
     def __init__(self, name, expander, pins):
         self.name = name
         self.exp = expander
         self.pins = pins # [rpwm, lpwm, r_en, l_en]
-        self.stop()
+        for p in self.pins:
+            self.exp.pin(p, mode=0, value=0)
 
     def forward(self):
-        self.exp.digital_write(self.pins[2], 1) # R_EN
-        self.exp.digital_write(self.pins[3], 1) # L_EN
-        self.exp.digital_write(self.pins[0], 0) # RPWM
-        self.exp.digital_write(self.pins[1], 1) # LPWM
+        self.exp.pin(self.pins[2], value=1)
+        self.exp.pin(self.pins[3], value=1)
+        self.exp.pin(self.pins[0], value=0)
+        self.exp.pin(self.pins[1], value=1)
 
     def backward(self):
-        self.exp.digital_write(self.pins[2], 1)
-        self.exp.digital_write(self.pins[3], 1)
-        self.exp.digital_write(self.pins[0], 1)
-        self.exp.digital_write(self.pins[1], 0)
+        self.exp.pin(self.pins[2], value=1)
+        self.exp.pin(self.pins[3], value=1)
+        self.exp.pin(self.pins[0], value=1)
+        self.exp.pin(self.pins[1], value=0)
 
     def stop(self):
-        self.exp.digital_write(self.pins[2], 0)
-        self.exp.digital_write(self.pins[3], 0)
-        self.exp.digital_write(self.pins[0], 0)
-        self.exp.digital_write(self.pins[1], 0)
+        self.exp.pin(self.pins[2], value=0)
+        self.exp.pin(self.pins[3], value=0)
+        self.exp.pin(self.pins[0], value=0)
+        self.exp.pin(self.pins[1], value=0)
 
-# Class for motors directly on Pico (Pitch, Roll)
+# Class B: For motors connected directly to Pico GPIOs
 class DirectMotor:
     def __init__(self, name, pins):
         self.name = name
-        # pins = [rpwm, lpwm, r_en, l_en]
-        self.rpwm = Pin(pins[0], Pin.OUT)
-        self.lpwm = Pin(pins[1], Pin.OUT)
-        self.r_en = Pin(pins[2], Pin.OUT)
-        self.l_en = Pin(pins[3], Pin.OUT)
+        # pins = [RPWM_GPIO, LPWM_GPIO, R_EN_GPIO, L_EN_GPIO]
+        self.rpwm = machine.Pin(pins[0], machine.Pin.OUT)
+        self.lpwm = machine.Pin(pins[1], machine.Pin.OUT)
+        self.ren  = machine.Pin(pins[2], machine.Pin.OUT)
+        self.len  = machine.Pin(pins[3], machine.Pin.OUT)
         self.stop()
 
     def forward(self):
-        self.r_en.value(1); self.l_en.value(1)
-        self.rpwm.value(0); self.lpwm.value(1)
+        self.ren.value(1)
+        self.len.value(1)
+        self.rpwm.value(0)
+        self.lpwm.value(1)
 
     def backward(self):
-        self.r_en.value(1); self.l_en.value(1)
-        self.rpwm.value(1); self.lpwm.value(0)
+        self.ren.value(1)
+        self.len.value(1)
+        self.rpwm.value(1)
+        self.lpwm.value(0)
 
     def stop(self):
-        self.r_en.value(0); self.l_en.value(0)
-        self.rpwm.value(0); self.lpwm.value(0)
+        self.ren.value(0)
+        self.len.value(0)
+        self.rpwm.value(0)
+        self.lpwm.value(0)
 
-# --- PIN DEFINITIONS ---
-# Expander Motors (Standard Wiring)
-base     = ExpanderMotor("Base", exp1, [0, 1, 2, 3])
+# --- 4. MOTOR DEFINITIONS ---
+
+# Group 1: The Main Arm (Uses Expander 1)
+# These use the internal 0-15 numbering of the MCP23017
+base     = ExpanderMotor("Base",     exp1, [0, 1, 2, 3])
 shoulder = ExpanderMotor("Shoulder", exp1, [4, 5, 6, 7])
-elbow    = ExpanderMotor("Elbow", exp1, [8, 9, 10, 11])
-gripper  = ExpanderMotor("Gripper", exp1, [12, 13, 14, 15])
+elbow    = ExpanderMotor("Elbow",    exp1, [8, 9, 10, 11])
+gripper  = ExpanderMotor("Gripper",  exp1, [12, 13, 14, 15])
 
-# Direct Motors (Using free Pico pins)
-pitch    = DirectMotor("Pitch", [0, 1, 2, 3])
-roll     = DirectMotor("Roll", [6, 7, 8, 9])
+# Group 2: The Wrists (Uses Direct Pico Pins)
+# WARNING: YOU MUST ENTER THE CORRECT GPIO NUMBERS HERE
+# Example: If Pitch uses GP10, GP11, GP12, GP13 -> [10, 11, 12, 13]
+pitch    = DirectMotor("Pitch", [0, 1, 2, 3]) # <--- UPDATE THIS
+roll     = DirectMotor("Roll",  [6, 7, 8, 9]) # <--- UPDATE THIS
 
-# --- COMMAND LISTENER ---
+# --- 5. COMMAND LISTENER ---
 print(f"{ROBOT_ID}_READY")
+
+def handle_command(cmd):
+    cmd = cmd.strip().upper()
+    
+    if cmd == "WHO_ARE_YOU":
+        print(ROBOT_ID)
+        return
+
+    # MOVEMENT COMMANDS
+    if cmd == "MOVE_BASE_FWD":    base.forward()
+    elif cmd == "MOVE_BASE_BACK": base.backward()
+    
+    elif cmd == "EXTEND_ARM":     
+        shoulder.forward()
+        elbow.forward()
+    elif cmd == "RETRACT_ARM":    
+        shoulder.backward()
+        elbow.backward()
+        
+    elif cmd == "GRIPPER_CLOSE":  gripper.forward()
+    elif cmd == "GRIPPER_OPEN":   gripper.backward()
+    
+    elif cmd == "PITCH_UP":       pitch.forward()
+    elif cmd == "PITCH_DOWN":     pitch.backward()
+    
+    elif cmd == "STOP" or cmd == "STOP_ALL": 
+        base.stop(); shoulder.stop(); elbow.stop(); 
+        gripper.stop(); pitch.stop(); roll.stop()
+
 while True:
     if select.select([sys.stdin], [], [], 0)[0]:
-        cmd = sys.stdin.readline().strip()
-        
-        if cmd == "WHO_ARE_YOU": print(ROBOT_ID)
-        elif cmd == "MOVE_BASE_FWD": base.forward()
-        elif cmd == "MOVE_BASE_BACK": base.backward()
-        elif cmd == "STOP": 
-            base.stop(); shoulder.stop(); elbow.stop()
-            pitch.stop(); roll.stop(); gripper.stop()
-    time.sleep(0.01)
+        line = sys.stdin.readline()
+        if line: handle_command(line)
