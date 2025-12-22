@@ -9,82 +9,95 @@ import serial
 import time
 import glob
 
+print(">>> INITIALIZING SCORBOT FLEET <<<")
+
 def find_robots():
-    """
-    Scans all USB serial ports and asks connected devices for their ID.
-    Returns a dictionary: {'ARM_1': serial_connection, 'ARM_2': serial_connection}
-    """
     robots = {}
-    # Find all USB serial devices (usually /dev/ttyACM0, ACM1, etc.)
+    # Scan for USB devices
     ports = glob.glob('/dev/ttyACM*')
-    
-    print(f"Scanning USB ports: {ports}...")
-    
     for port in ports:
         try:
-            # Connect to the port
-            print(f"Connecting to {port}...", end="")
+            # Connect
             s = serial.Serial(port, 115200, timeout=2)
-            time.sleep(2) # Wait for the connection to stabilize
-            
-            # Clear any old data
+            time.sleep(2)
             s.reset_input_buffer()
             
-            # Ask the Pico: "Who are you?"
+            # Ask identity
             s.write(b"WHO_ARE_YOU\n")
             s.flush()
             
-            # Listen for the answer (Pico should reply "ARM_1" or "ARM_2")
-            response = s.readline().decode('utf-8').strip()
-            print(f" Identity: {response}")
-            
-            if response == "ARM_1":
-                robots['ARM_1'] = s
-            elif response == "ARM_2":
-                robots['ARM_2'] = s
-            else:
-                print(f"  -> Warning: Unknown device response: '{response}'")
-                s.close()
-                
-        except Exception as e:
-            print(f"\n  -> Error on {port}: {e}")
-            
+            # Read response
+            for i in range(5): 
+                line = s.readline().decode('utf-8').strip()
+                if "ARM_1" in line: 
+                    robots['ARM_1'] = s
+                    break
+                elif "ARM_2" in line: 
+                    robots['ARM_2'] = s
+                    break
+        except: 
+            pass
     return robots
 
-# --- MAIN MISSION SEQUENCE ---
-print(">>> INITIALIZING ROBOT FLEET <<<")
+# --- MAIN SEQUENCE ---
 fleet = find_robots()
 
-# Check if we found both arms
 if 'ARM_1' in fleet and 'ARM_2' in fleet:
-    print("\n--- FLEET READY: BOTH ARMS ONLINE ---")
+    print("\nSUCCESS: Both Arms Connected!")
     arm1 = fleet['ARM_1']
     arm2 = fleet['ARM_2']
     
-    # --- MISSION 1: Visual Check ---
-    print("\n[Mission 1] Signaling Arm 1 (Bottom Port)...")
-    arm1.write(b"BLINK\n")
-    time.sleep(1) # Wait for blink to finish
+    # --- GENTLE MOVEMENT TEST ---
+    print("\n--- STARTING GENTLE TEST ---")
     
-    print("[Mission 1] Signaling Arm 2 (Top Port)...")
-    arm2.write(b"BLINK\n")
-    time.sleep(1)
+    print("1. RELAY CLICK (Arm 2)")
+    arm2.write(b"RELAY_1_ON\n"); time.sleep(0.5)
+    arm2.write(b"RELAY_1_OFF\n"); time.sleep(0.5)
+
+    print("2. BASE WIGGLE (Both)")
+    # Move Base Forward
+    arm1.write(b"MOVE_BASE_FWD\n")
+    arm2.write(b"MOVE_BASE_BACK\n")
+    time.sleep(1.2) 
+    arm1.write(b"STOP\n")
+    arm2.write(b"STOP\n")
+    time.sleep(0.5)
     
-    print("\n>>> Mission Complete. Fleet Standing By.")
+    print("3. GENTLE EXTEND (0.6s)")
+    # Short burst out
+    arm1.write(b"EXTEND_ARM\n")
+    arm2.write(b"EXTEND_ARM\n")
+    time.sleep(0.8) 
+    arm1.write(b"STOP_ALL\n")
+    arm2.write(b"STOP_ALL\n")
+    time.sleep(0.5)
+ 
+
+    print("4. RETURN HOME (0.6s)")
+    # Bring it back
+    arm1.write(b"RETRACT_ARM\n")
+    arm2.write(b"RETRACT_ARM\n")
+    time.sleep(0.8) 
     
-    # Clean up connections
+    # IMPORTANT: Stop retracting before moving base!
+    arm1.write(b"STOP_ALL\n")
+    arm2.write(b"STOP_ALL\n")
+    time.sleep(0.5) 
+    
+    print("5. RETURN BASE")
+    # Move Base Back
+    arm1.write(b"MOVE_BASE_BACK\n")
+    arm2.write(b"MOVE_BASE_FWD\n")
+    
+    # IMPORTANT: Give it time to actually move!
+    time.sleep(1.2) 
+    
+    arm1.write(b"STOP_ALL\n")
+    arm2.write(b"STOP_ALL\n")
+
+    print("\nTEST COMPLETE.")
     arm1.close()
     arm2.close()
-    
-elif 'ARM_1' in fleet:
-    print("\n--- PARTIAL FLEET: ONLY ARM 1 FOUND ---")
-    fleet['ARM_1'].write(b"BLINK\n")
-    fleet['ARM_1'].close()
-
-elif 'ARM_2' in fleet:
-    print("\n--- PARTIAL FLEET: ONLY ARM 2 FOUND ---")
-    fleet['ARM_2'].write(b"BLINK\n")
-    fleet['ARM_2'].close()
 
 else:
-    print("\n[ERROR] No robots found! Check USB cables.")
+    print(f"ERROR: Only found {list(fleet.keys())}. Connect both arms!")
