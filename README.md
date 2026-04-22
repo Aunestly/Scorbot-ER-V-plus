@@ -2,7 +2,7 @@
 
 > **Portfolio Link:** [https://aunestly.github.io]
 
-![Project Banner](https://github.com/Aunestly/Scorbot-ER-V-Hardware-Test/blob/95b3f52d41798fb5e0a2a74700c69d04ce0dbfac/IMG_8894.png)
+
 
 ## 📖 Executive Summary
 **Architected a system evolution from a tethered legacy prototype to a standalone distributed computing model.**
