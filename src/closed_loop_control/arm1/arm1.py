@@ -5,6 +5,8 @@ import sys
 from pid import PID
 import mcp23017
 
+stop_requested = False
+
 # ==========================================
 # 1. WAYPOINTS
 # ==========================================
@@ -161,6 +163,10 @@ def go_to(target, timeout=8.0):
     print(f"   Moving to {target}...", end="")
     start = time.time()
     while time.time() - start < timeout:
+        if stop_requested:  # <--- ADD THIS CHECK
+            print(" STOPPED")
+            return
+        
         p_base = pid_base.compute(target[0], pos[0])
         p_shl  = pid_shl.compute(target[1], pos[1])
         p_elb  = pid_elb.compute(target[2], pos[2])
@@ -178,7 +184,8 @@ def go_to(target, timeout=8.0):
 # 6. CYCLE EXECUTION
 # ==========================================
 def run_cycle():
-    global pos 
+    global pos, stop_requested
+    stop_requested = False 
     
     print("\n>>> STARTING MISSION <<<")
     
@@ -235,3 +242,47 @@ def run_cycle():
     pos = [0, 0, 0] 
     print("   (True Zero Locked!)")
     print("\n>>> MISSION COMPLETE <<<")
+    
+# ==========================================
+# 7. CONTINUOUS EXECUTION LOOP
+# ==========================================
+def run_continuous():
+    print("\n>>> ENTERING CONTINUOUS MODE <<<")
+    print(">>> Press Ctrl+C in the terminal to stop safely. <<<")
+    
+    try:
+        cycle_count = 1
+        while True:
+            print(f"\n=====================================")
+            print(f"       STARTING CYCLE #{cycle_count}")
+            print(f"=====================================")
+            
+            run_cycle()  # Call your existing choreography
+            
+            cycle_count += 1
+            print("\n>>> Waiting 3 seconds before next pickup... <<<")
+            time.sleep(3.0)  # Pause so you have time to place a new block!
+            
+    except KeyboardInterrupt:
+        # This triggers the moment you press Ctrl+C
+        print("\n\n>>> 🛑 MANUAL STOP DETECTED (Ctrl+C) 🛑 <<<")
+        
+    finally:
+        # This ALWAYS runs when the loop breaks, ensuring a safe hardware shutdown
+        print(">>> EMERGENCY SHUTDOWN: KILLING ALL MOTOR POWER <<<")
+        set_motor(BASE_RPWM, BASE_LPWM, 0)
+        set_motor(SHL_RPWM, SHL_LPWM, 0)
+        set_motor(ELB_RPWM, ELB_LPWM, 0)
+        
+        # Shut off the I2C Expander pins (Wrist & Gripper) just in case
+        if mcp is not None:
+            mcp.pin(WP1_RPWM, value=0); mcp.pin(WP1_LPWM, value=0)
+            mcp.pin(WP2_RPWM, value=0); mcp.pin(WP2_LPWM, value=0)
+            mcp.pin(GRIP_RPWM, value=0); mcp.pin(GRIP_LPWM, value=0)
+            mcp.pin(WP1_REN, value=0); mcp.pin(WP1_LEN, value=0)
+            mcp.pin(WP2_REN, value=0); mcp.pin(WP2_LEN, value=0)
+            mcp.pin(GRIP_REN, value=0); mcp.pin(GRIP_LEN, value=0)
+            
+        print(">>> SYSTEM SAFELY PARKED. EXITING. <<<")
+        sys.exit()
+
