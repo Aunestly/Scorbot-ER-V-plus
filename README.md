@@ -83,43 +83,6 @@ SCORBOT-ER-V-Plus-Modernization/
 - **Git & GitHub** for version control and collaboration  
 
 
-
-## 📊 Master Pinout & Data Architecture
-
-To manage the complexity of the legacy 50-pin interface, I normalized the hardware connections into a relational dataset. This abstracts physical wiring into logical addresses for the software.
-
-### Master DB50 Pinout Map
-
-*The following mapping was verified using multimeter continuity testing against legacy documentation. This schema represents the final "Production" architecture utilizing dual I/O expanders.*
-
-| Axis | Component | DB50 Pin (+) | DB50 Pin (-) | Controller Logic | Address/Pin |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Axis 1** | Base Motor | 50 | 17 | Expander 1 (0x20) | `GPA0` - `GPA3` |
-| | Base Encoder | 2 (A) | 5 (B) | Pico Direct | `GP18` / `GP19` |
-| | Base Home | 23 (Sig) | 33 (GND) | Pico Direct | `GP22` |
-| **Axis 2** | Shoulder Motor | 49 | 16 | Expander 1 (0x20) | `GPA4` - `GPA7` |
-| | Shoulder Encoder | 1 (A) | 21 (B) | Pico Direct | `GP20` / `GP21` |
-| | Shoulder Home | 7 (Sig) | 32 (GND) | Pico Direct | `GP26` |
-| **Axis 3** | Elbow Motor | 48 | 15 | Expander 1 (0x20) | `GPB0` - `GPB3` |
-| | Elbow Encoder | 36 (A) | 4 (B) | Pico Direct | `GP27` / `GP28` |
-| | Elbow Home | 24 (Sig) | 31 (GND) | Pico Direct | `GP16` |
-| **Axis 4** | Wrist Pitch | 47 | 14 | Expander 2 (0x21) | `GPA1` - `GPA4` |
-| | Pitch Encoder | 35 (A) | 20 (B) | Pico Direct | `GP17` / `GP15` |
-| | Pitch Home | 8 (Sig) | 30 (GND) | Pico Direct | `GP14` |
-| **Axis 5** | Wrist Roll | 46 | 13 | Expander 2 (0x21) | `GPB4` - `GPB7` |
-| | Roll Encoder | 18 (A) | 3 (B) | Pico Direct | `GP13` / `GP12` |
-| | Roll Home | 6 (Sig) | 29 (GND) | Pico Direct | `GP11` |
-| **Axis 6** | Gripper Motor | 45 | 12 | Expander 1 (0x20) | `GPB4` - `GPB7` |
-| | Gripper Encoder | 34 (A) | 19 (B) | Pico Direct | `GP10` / `GP9` |
-| **Aux** | Conveyor Relay | N/A | N/A | Expander 2 (0x21) | `GPB0` / `GPB1` |
-
-**Power Distribution Notes:**
-
-  * **Encoder Power (VLED):** All encoders connect to the common **5V Rail** on pins 11, 27, 10, 26, 9, 25.
-  * **Common Ground:** All sensor grounds connect to the **Negative Bus Bar**.
-
------
-
 ## 🛠️ Engineering Methodology
 
 ### 1. Direct GPIO Hardware Interface (Prototype Phase)
